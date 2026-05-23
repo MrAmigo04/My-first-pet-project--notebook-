@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 
-// Палитра благородных кожаных оттенков: Коричневый, Изумрудный, Бордовый, Темно-синий, Горчичный, Графитовый
 const NOTE_COLORS = ['#8b5a2b', '#1e4620', '#6b1d1d', '#1f3a60', '#b7791f', '#2d3748'];
 
 function App() {
@@ -11,7 +10,7 @@ function App() {
       {
         id: 1,
         title: 'Моя первая заметка',
-        color: '#8b5a2b', // Стартовый красивый коричневый
+        color: '#8b5a2b',
         text: 'Привет! Это твой обновленный блокнот.\n\nТеперь выбор цвета полностью меняет кожаную текстуру обложки и активные элементы.\n\nСправа на деревянном столе лежит твой верный карандаш. Пиши свои мысли свободно!'
       }
     ];
@@ -32,11 +31,11 @@ function App() {
     localStorage.setItem('notebook-text-active-id-v2', JSON.stringify(activeNoteId));
   }, [activeNoteId]);
 
-  const activeNote = notes.find(note => note.id === activeNoteId) || notes;
+  const activeNote = notes.find(note => note.id === activeNoteId) || notes[0];
 
   useEffect(() => {
     if (notes.length > 0 && !notes.some(n => n.id === activeNoteId)) {
-      setActiveNoteId(notes.id);
+      setActiveNoteId(notes[0].id);
     }
   }, [notes, activeNoteId]);
 
@@ -86,13 +85,9 @@ function App() {
   if (!activeNote) return null;
 
   return (
-      // Передаем выбранный цвет как CSS-переменную на весь контейнер
       <div className="app-container" style={{ '--active-note-color': activeNote.color }}>
-
-        {/* Деревянный стол (фоновая текстура) */}
         <div className="wooden-table-overlay"></div>
 
-        {/* Боковая панель */}
         <div className="sidebar">
           <button onClick={createNewNote} className="add-note-button">
             + Новая заметка
@@ -117,9 +112,7 @@ function App() {
           </div>
         </div>
 
-        {/* Обложка блокнота */}
         <div className="notebook-cover">
-          {/* Кожаная текстура поверх цвета */}
           <div className="leather-texture"></div>
 
           <div className="notebook-rings">
@@ -163,6 +156,8 @@ function App() {
               )}
             </div>
 
+            <div className="char-counter">Символов: {activeNote.text.length}</div>
+
             <textarea
                 className="notebook-editor"
                 placeholder="Начни писать свои мысли здесь..."
@@ -172,7 +167,6 @@ function App() {
           </div>
         </div>
 
-        {/* Реалистичный 3D-карандаш на столе */}
         <div className="desk-pencil">
           <div className="pencil-tip"></div>
           <div className="pencil-wood"></div>
@@ -180,7 +174,6 @@ function App() {
           <div className="pencil-eraser-gold"></div>
           <div className="pencil-eraser"></div>
         </div>
-
       </div>
   );
 }
