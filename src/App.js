@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
 import './App.css';
+// Импортируем наш собственный созданный компонент
+import Sidebar from './Components/Sidebar';
+// Импортируем нашу функцию-утилиту
+import { countWords } from './Utils/textUtils';
 
 const NOTE_COLORS = ['#8b5a2b', '#1e4620', '#6b1d1d', '#1f3a60', '#b7791f', '#2d3748'];
 
@@ -11,7 +15,7 @@ function App() {
         id: 1,
         title: 'Моя первая заметка',
         color: '#8b5a2b',
-        text: ''
+        text: 'Привет! Это твой обновленный блокнот.'
       }
     ];
   });
@@ -31,11 +35,11 @@ function App() {
     localStorage.setItem('notebook-text-active-id-v2', JSON.stringify(activeNoteId));
   }, [activeNoteId]);
 
-  const activeNote = notes.find(note => note.id === activeNoteId) || notes[0];
+  const activeNote = notes.find(note => note.id === activeNoteId) || notes;
 
   useEffect(() => {
     if (notes.length > 0 && !notes.some(n => n.id === activeNoteId)) {
-      setActiveNoteId(notes[0].id);
+      setActiveNoteId(notes.id);
     }
   }, [notes, activeNoteId]);
 
@@ -88,29 +92,14 @@ function App() {
       <div className="app-container" style={{ '--active-note-color': activeNote.color }}>
         <div className="wooden-table-overlay"></div>
 
-        <div className="sidebar">
-          <button onClick={createNewNote} className="add-note-button">
-            + Новая заметка
-          </button>
-          <div className="notes-list">
-            {notes.map(note => (
-                <div
-                    key={note.id}
-                    className={`sidebar-note-item ${note.id === activeNote.id ? 'active' : ''}`}
-                    style={note.id === activeNote.id ? { backgroundColor: note.color, borderColor: note.color } : {}}
-                    onClick={() => setActiveNoteId(note.id)}
-                >
-                  <div className="sidebar-note-left">
-                    <span className="note-color-badge" style={{ backgroundColor: note.color }}></span>
-                    <span className="sidebar-note-title">{note.title}</span>
-                  </div>
-                  <button onClick={(e) => deleteNote(note.id, e)} className="sidebar-delete-note">
-                    ✕
-                  </button>
-                </div>
-            ))}
-          </div>
-        </div>
+        {/* ИСПОЛЬЗУЕМ НАШ ВЫНЕСЕННЫЙ КОМПОНЕНТ SIDEBAR (Передаем пропсы) */}
+        <Sidebar
+            notes={notes}
+            activeNoteId={activeNoteId}
+            setActiveNoteId={setActiveNoteId}
+            createNewNote={createNewNote}
+            deleteNote={deleteNote}
+        />
 
         <div className="notebook-cover">
           <div className="leather-texture"></div>
@@ -156,7 +145,10 @@ function App() {
               )}
             </div>
 
-            <div className="char-counter">Символов: {activeNote.text.length}</div>
+            {/* ИСПОЛЬЗУЕМ НАШУ УТИЛИТУ И ВЫВОДИМ ЕЩЕ И СЛОВА */}
+            <div className="char-counter">
+              Символов: {activeNote.text.length} | Слов: {countWords(activeNote.text)}
+            </div>
 
             <textarea
                 className="notebook-editor"
