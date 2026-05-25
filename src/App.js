@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
-// Импортируем наш собственный созданный компонент
-import Sidebar from './Components/Sidebar';
-// Импортируем нашу функцию-утилиту
-import { countWords } from './Utils/textUtils';
+
+// Импортируем компоненты
+import Navbar from './Components/Navbar';
+
+// Импортируем страницы
+import Home from './pages/Home';
+import Notebook from './pages/Notebook';
+import Analytics from './pages/Analytics';
+import Settings from './pages/Settings';
+import About from './pages/About';
 
 const NOTE_COLORS = ['#8b5a2b', '#1e4620', '#6b1d1d', '#1f3a60', '#b7791f', '#2d3748'];
 
@@ -15,7 +22,7 @@ function App() {
         id: 1,
         title: 'Моя первая заметка',
         color: '#8b5a2b',
-        text: 'Привет! Это твой обновленный блокнот.'
+        text: 'Начни писать свои мысли здесь.'
       }
     ];
   });
@@ -35,11 +42,11 @@ function App() {
     localStorage.setItem('notebook-text-active-id-v2', JSON.stringify(activeNoteId));
   }, [activeNoteId]);
 
-  const activeNote = notes.find(note => note.id === activeNoteId) || notes;
+  const activeNote = notes.find(note => note.id === activeNoteId) || notes[0];
 
   useEffect(() => {
     if (notes.length > 0 && !notes.some(n => n.id === activeNoteId)) {
-      setActiveNoteId(notes.id);
+      setActiveNoteId(notes[0].id);
     }
   }, [notes, activeNoteId]);
 
@@ -89,84 +96,41 @@ function App() {
   if (!activeNote) return null;
 
   return (
-      <div className="app-container" style={{ '--active-note-color': activeNote.color }}>
-        <div className="wooden-table-overlay"></div>
+      <Router>
+        <div className="app-main-wrapper" style={{ '--active-note-color': activeNote.color }}>
+          {/* Шапка сайта видна всегда на верхнем уровне */}
+          <Navbar />
 
-        {/* ИСПОЛЬЗУЕМ НАШ ВЫНЕСЕННЫЙ КОМПОНЕНТ SIDEBAR (Передаем пропсы) */}
-        <Sidebar
-            notes={notes}
-            activeNoteId={activeNoteId}
-            setActiveNoteId={setActiveNoteId}
-            createNewNote={createNewNote}
-            deleteNote={deleteNote}
-        />
-
-        <div className="notebook-cover">
-          <div className="leather-texture"></div>
-
-          <div className="notebook-rings">
-            <div className="ring"></div>
-            <div className="ring"></div>
-            <div className="ring"></div>
-            <div className="ring"></div>
-            <div className="ring"></div>
-          </div>
-
-          <div className="notebook">
-            <div className="paper-texture"></div>
-
-            <div className="title-container">
-              {isEditingTitle ? (
-                  <div className="title-edit-zone">
-                    <input
-                        type="text"
-                        value={activeNote.title}
-                        onChange={(e) => handleTitleChange(e.target.value)}
-                        onBlur={() => setTimeout(() => setIsEditingTitle(false), 200)}
-                        onKeyDown={(e) => e.key === 'Enter' && setIsEditingTitle(false)}
-                        className="title-input"
-                        autoFocus
+          {/* Контент меняется в зависимости от ссылки */}
+          <div className="main-content-area">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route
+                  path="/notebook"
+                  element={
+                    <Notebook
+                        notes={notes}
+                        activeNoteId={activeNoteId}
+                        setActiveNoteId={setActiveNoteId}
+                        createNewNote={createNewNote}
+                        deleteNote={deleteNote}
+                        activeNote={activeNote}
+                        isEditingTitle={isEditingTitle}
+                        setIsEditingTitle={setIsEditingTitle}
+                        handleTitleChange={handleTitleChange}
+                        NOTE_COLORS={NOTE_COLORS}
+                        handleColorChange={handleColorChange}
+                        handleTextChange={handleTextChange}
                     />
-                    <div className="color-picker">
-                      {NOTE_COLORS.map(color => (
-                          <button
-                              key={color}
-                              className={`color-dot ${activeNote.color === color ? 'selected' : ''}`}
-                              style={{ backgroundColor: color }}
-                              onClick={() => handleColorChange(color)}
-                          />
-                      ))}
-                    </div>
-                  </div>
-              ) : (
-                  <h1 className="title" onClick={() => setIsEditingTitle(true)} title="Кликни для изменения">
-                    {activeNote.title} ✏️
-                  </h1>
-              )}
-            </div>
-
-            {/* ИСПОЛЬЗУЕМ НАШУ УТИЛИТУ И ВЫВОДИМ ЕЩЕ И СЛОВА */}
-            <div className="char-counter">
-              Символов: {activeNote.text.length} | Слов: {countWords(activeNote.text)}
-            </div>
-
-            <textarea
-                className="notebook-editor"
-                placeholder="Начни писать свои мысли здесь..."
-                value={activeNote.text}
-                onChange={(e) => handleTextChange(e.target.value)}
-            />
+                  }
+              />
+              <Route path="/analytics" element={<Analytics notes={notes} />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/about" element={<About />} />
+            </Routes>
           </div>
         </div>
-
-        <div className="desk-pencil">
-          <div className="pencil-tip"></div>
-          <div className="pencil-wood"></div>
-          <div className="pencil-body"></div>
-          <div className="pencil-eraser-gold"></div>
-          <div className="pencil-eraser"></div>
-        </div>
-      </div>
+      </Router>
   );
 }
 
