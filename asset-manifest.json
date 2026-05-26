@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/My-first-pet-project--notebook-/static/css/main.633fd06d.css",
-    "main.js": "/My-first-pet-project--notebook-/static/js/main.ce9e2c77.js",
+    "main.js": "/My-first-pet-project--notebook-/static/js/main.c85adfee.js",
     "static/js/453.4d690037.chunk.js": "/My-first-pet-project--notebook-/static/js/453.4d690037.chunk.js",
     "index.html": "/My-first-pet-project--notebook-/index.html",
     "main.633fd06d.css.map": "/My-first-pet-project--notebook-/static/css/main.633fd06d.css.map",
-    "main.ce9e2c77.js.map": "/My-first-pet-project--notebook-/static/js/main.ce9e2c77.js.map",
+    "main.c85adfee.js.map": "/My-first-pet-project--notebook-/static/js/main.c85adfee.js.map",
     "453.4d690037.chunk.js.map": "/My-first-pet-project--notebook-/static/js/453.4d690037.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.633fd06d.css",
-    "static/js/main.ce9e2c77.js"
+    "static/js/main.c85adfee.js"
   ]
 }
