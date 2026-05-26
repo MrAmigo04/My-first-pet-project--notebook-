@@ -2,7 +2,9 @@ import React from 'react';
 import Sidebar from '../Components/Sidebar';
 import { countWords } from '../Utils/textUtils';
 
-function Notebook({ notes, activeNoteId, setActiveNoteId, createNewNote, deleteNote, activeNote, isEditingTitle, setIsEditingTitle, handleTitleChange, NOTE_COLORS, handleColorChange, handleTextChange }) {
+import { NOTE_COLORS } from '../constants/noteColors';
+
+function Notebook({ notes, activeNoteId, setActiveNoteId, createNewNote, deleteNote, activeNote, isEditingTitle, setIsEditingTitle, handleTitleChange, handleColorChange, handleTextChange }) {
     return (
         <div className="notebook-page-layout">
             <Sidebar

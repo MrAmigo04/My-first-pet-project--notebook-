@@ -2,17 +2,15 @@ import { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 
-// Импортируем компоненты
 import Navbar from './Components/Navbar';
 
-// Импортируем страницы
 import Home from './pages/Home';
 import Notebook from './pages/Notebook';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import About from './pages/About';
 
-const NOTE_COLORS = ['#8b5a2b', '#1e4620', '#6b1d1d', '#1f3a60', '#b7791f', '#2d3748'];
+import { NOTE_COLORS } from './constants/noteColors';
 
 function App() {
   const [notes, setNotes] = useState(() => {
@@ -22,7 +20,7 @@ function App() {
         id: 1,
         title: 'Моя первая заметка',
         color: '#8b5a2b',
-        text: 'Начни писать свои мысли здесь.'
+        text: 'Начни писать свои мысли здесь...'
       }
     ];
   });
