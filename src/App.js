@@ -16,6 +16,7 @@ console.log("➡️ [RENDER] Компонент App перерисовывает
 
 
 function App() {
+  const [quote, setQuote] = useState('Загрузка вдохновения...');
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem('notebook-text-data-v2');
     return savedNotes ? JSON.parse(savedNotes) : [
@@ -66,6 +67,26 @@ function App() {
   useEffect(() => {
     console.log("👶 [LIFECYCLE - MOUNT] Компонент родился! Этот код срабатывает ТОЛЬКО ОДИН РАЗ при загрузке страницы.");
   }, []); // Пустые скобки [] означают, что эффект не следит ни за какими переменными
+
+  useEffect(() => {
+    const fetchQuote = async () => {
+      try {
+        // Запрос к открытому серверу цитат
+        const response = await fetch('https://breakingbadquotes.xyz');
+        if (!response.ok) throw new Error('Ошибка сети');
+        const data = await response.json();
+
+        // Сервер возвращает массив, берем первый элемент [0]
+        setQuote(`"${data[0].quote}" — ${data[0].author}`);
+      } catch (error) {
+        console.log('Не удалось загрузить цитату:', error);
+        setQuote('"Единственный способ делать великие дела — любить то, что вы делаете." — Стив Джобс');
+      }
+    };
+
+    fetchQuote();
+  }, []);
+
 
   const createNewNote = () => {
     const newNote = {
@@ -121,7 +142,7 @@ function App() {
           {/* Контент меняется в зависимости от ссылки */}
           <div className="main-content-area">
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Home quote={quote} />} />
               <Route
                   path="/notebook"
                   element={
