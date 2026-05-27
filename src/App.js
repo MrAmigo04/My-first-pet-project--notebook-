@@ -17,6 +17,12 @@ console.log("➡️ [RENDER] Компонент App перерисовывает
 function App() {
   const [quote, setQuote] = useState('Загрузка вдохновения...');
 
+  // 1. Создаем стейт тёмной темы с получением данных из localStorage
+  const [darkMode, setDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem('notebook-dark-mode');
+    return savedTheme ? JSON.parse(savedTheme) : false;
+  });
+
   // Инициализация заметок из localStorage
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem('notebook-text-data-v2');
@@ -40,6 +46,11 @@ function App() {
 
   // Вычисляем активную заметку безопасным способом
   const activeNote = notes.find(note => note.id === activeNoteId) || notes[0];
+
+  // 2. Эффект для сохранения темы в localStorage при её изменении
+  useEffect(() => {
+    localStorage.setItem('notebook-dark-mode', JSON.stringify(darkMode));
+  }, [darkMode]);
 
   // Проверка: если активная заметка была удалена, переключаемся на первую доступную
   useEffect(() => {
@@ -73,7 +84,6 @@ function App() {
       '"Тот, кто победил себя — самый сильный воин." — Лао-Цзы'
     ];
 
-    // Выбираем случайный индекс из массива
     const randomIndex = Math.floor(Math.random() * localQuotes.length);
     setQuote(localQuotes[randomIndex]);
   };
@@ -126,11 +136,17 @@ function App() {
     ));
   };
 
+  // 3. Функция переключения ночного режима
+  const handleToggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
   if (!activeNote) return null;
 
   return (
       <Router>
-        <div className="app-main-wrapper" style={{ '--active-note-color': activeNote.color }}>
+        {/* Добавляем динамический класс dark-theme в зависимости от состояния стейта */}
+        <div className={`app-main-wrapper ${darkMode ? 'dark-theme' : ''}`} style={{ '--active-note-color': activeNote.color }}>
           <Navbar />
           <div className="main-content-area">
             <Routes>
@@ -155,7 +171,8 @@ function App() {
                   }
               />
               <Route path="/analytics" element={<Analytics notes={notes} />} />
-              <Route path="/settings" element={<Settings />} />
+              {/* Передаем пропсы darkMode и функцию handleToggleDarkMode в компонент Settings */}
+              <Route path="/settings" element={<Settings darkMode={darkMode} onToggleDarkMode={handleToggleDarkMode} />} />
               <Route path="/about" element={<About />} />
             </Routes>
           </div>

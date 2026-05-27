@@ -490,9 +490,8 @@
 }
 
 .analytics-card {
-  flex: 1;
-  background-color: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background-color: #241d19 !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
   padding: 20px;
   border-radius: var(--radius-small);
   @include center-flex;
@@ -503,15 +502,79 @@
 .analytics-card h3 {
   font-size: 36px;
   margin: 0 0 10px 0;
-  color: var(--active-note-color, #4a90e2);
+  color: var(--active-note-color, #8b5a2b) !important;
 }
 
 .analytics-card p {
   margin: 0;
   font-weight: 600;
+  color: #aaa !important;
 }
 
 .settings-mock {
   margin-top: 20px;
   font-size: 16px;
+}
+/* ==========================================================================
+ 8. СТИЛИ ДЛЯ ТЁМНОЙ ТЕМЫ (DARK MODE)
+ ========================================================================== */
+.dark-theme {
+  --table-bg: #140d0a;
+  --table-gradient-start: rgba(0, 0, 0, 0.7);
+  --table-gradient-end: rgba(0, 0, 0, 0.8);
+
+  --paper-bg: #2d241e;
+  --paper-line-color: rgba(255, 255, 255, 0.08);
+  --paper-margin-color: rgba(45, 35, 30, 0.8);
+  --ink-color: #f1dfc5;
+  --title-color: #ffffff;
+
+  // Белый фон самой подложки страницы меняем на темно-коричневый
+  .page-content {
+    background-color: rgba(30, 25, 22, 0.95) !important;
+    color: #e0e0e0 !important;
+    h2, p { color: #e0e0e0 !important; }
+  }
+
+  // Перекрашиваем шапку сайта и боковую панель блокнота
+  .main-navbar, .sidebar {
+    background-color: rgba(30, 25, 22, 0.95);
+    border-color: rgba(255, 255, 255, 0.05);
+    color: #e0e0e0;
+    h1, h2, h3, h4, span, p { color: #e0e0e0 !important; }
+  }
+
+  // Навигационные ссылки
+  .navbar-links a {
+    color: #aaa;
+    &:hover { background-color: rgba(255, 255, 255, 0.05); color: #fff; }
+  }
+
+  // Поиск, элементы заголовка блокнота и настройки
+  .title, .char-counter, .settings-item {
+    background-color: #241d19 !important;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+    color: #e0e0e0 !important;
+  }
+
+  // ПОДПРАВЛЕННЫЙ БЛОК: Карточки аналитики становятся темными ТОЛЬКО в темной теме!
+  .analytics-card {
+    background-color: #241d19 !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-left: 5px solid var(--active-note-color, #8b5a2b) !important;
+
+    h3 { color: var(--active-note-color, #8b5a2b) !important; }
+    p { color: #aaa !important; }
+  }
+
+  input[type="text"] {
+    background-color: #241d19 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
+  }
+
+  .daily-quote-box {
+    background-color: #241d19 !important;
+    color: #f1dfc5 !important;
+  }
 }
