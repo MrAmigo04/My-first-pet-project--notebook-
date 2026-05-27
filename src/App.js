@@ -14,9 +14,10 @@ import { NOTE_COLORS } from './constants/noteColors';
 
 console.log("➡️ [RENDER] Компонент App перерисовывается прямо сейчас!");
 
-
 function App() {
   const [quote, setQuote] = useState('Загрузка вдохновения...');
+
+  // Инициализация заметок из localStorage
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem('notebook-text-data-v2');
     return savedNotes ? JSON.parse(savedNotes) : [
@@ -29,6 +30,7 @@ function App() {
     ];
   });
 
+  // Инициализация активной заметки из localStorage
   const [activeNoteId, setActiveNoteId] = useState(() => {
     const savedActiveId = localStorage.getItem('notebook-text-active-id-v2');
     return savedActiveId ? JSON.parse(savedActiveId) : 1;
@@ -36,16 +38,10 @@ function App() {
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
 
-  useEffect(() => {
-    localStorage.setItem('notebook-text-data-v2', JSON.stringify(notes));
-  }, [notes]);
-
-  useEffect(() => {
-    localStorage.setItem('notebook-text-active-id-v2', JSON.stringify(activeNoteId));
-  }, [activeNoteId]);
-
+  // Вычисляем активную заметку безопасным способом
   const activeNote = notes.find(note => note.id === activeNoteId) || notes[0];
 
+  // Проверка: если активная заметка была удалена, переключаемся на первую доступную
   useEffect(() => {
     if (notes.length > 0 && !notes.some(n => n.id === activeNoteId)) {
       setActiveNoteId(notes[0].id);
@@ -56,37 +52,42 @@ function App() {
   useEffect(() => {
     console.log("⚡ [EFFECT] Сработал useEffect для сохранения текста! Зависимость [notes] изменилась.");
     localStorage.setItem('notebook-text-data-v2', JSON.stringify(notes));
-  }, [notes]); // [notes] — это dependency (зависимость)
+  }, [notes]);
 
-// Эффект смены активной заметки
+  // Эффект смены активной заметки
   useEffect(() => {
     console.log("⚡ [EFFECT] Сработал useEffect для смены ID заметки! Новая активная заметка:", activeNoteId);
     localStorage.setItem('notebook-text-active-id-v2', JSON.stringify(activeNoteId));
-  }, [activeNoteId]); // [activeNoteId] — это dependency
+  }, [activeNoteId]);
 
+  // Запрос цитаты при монтировании (MOUNT)
   useEffect(() => {
-    console.log("👶 [LIFECYCLE - MOUNT] Компонент родился! Этот код срабатывает ТОЛЬКО ОДИН РАЗ при загрузке страницы.");
-  }, []); // Пустые скобки [] означают, что эффект не следит ни за какими переменными
+    console.log("👶 [LIFECYCLE - MOUNT] Компонент родился! Запрашиваем цитату...");
 
-  useEffect(() => {
     const fetchQuote = async () => {
       try {
-        // Запрос к открытому серверу цитат
-        const response = await fetch('https://breakingbadquotes.xyz');
-        if (!response.ok) throw new Error('Ошибка сети');
+        const response = await fetch('https://dummyjson.com');
+        if (!response.ok) throw new Error('Ошибка сети при запросе цитаты');
         const data = await response.json();
 
-        // Сервер возвращает массив, берем первый элемент [0]
-        setQuote(`"${data[0].quote}" — ${data[0].author}`);
+        if (data && data.quote) {
+          setQuote(`"${data.quote}" — ${data.author}`);
+        }
       } catch (error) {
-        console.log('Не удалось загрузить цитату:', error);
-        setQuote('"Единственный способ делать великие дела — любить то, что вы делаете." — Стив Джобс');
+        console.log('Не удалось загрузить цитату из API:', error);
+
+        const localQuotes = [
+          '"Единственный способ делать великие дела — любить то, что вы делаете." — Стив Джобс',
+          '"Вчера — история, завтра — тайна, а сегодня — подарок." — Кунг-фу Панда',
+          '"Логика может привести вас от пункта А к пункту Б, а воображение — куда угодно." — Альберт Эйнштейн'
+        ];
+        const randomLocal = localQuotes[Math.floor(Math.random() * localQuotes.length)];
+        setQuote(randomLocal);
       }
     };
 
     fetchQuote();
   }, []);
-
 
   const createNewNote = () => {
     const newNote = {
@@ -136,10 +137,7 @@ function App() {
   return (
       <Router>
         <div className="app-main-wrapper" style={{ '--active-note-color': activeNote.color }}>
-          {/* Шапка сайта видна всегда на верхнем уровне */}
           <Navbar />
-
-          {/* Контент меняется в зависимости от ссылки */}
           <div className="main-content-area">
             <Routes>
               <Route path="/" element={<Home quote={quote} />} />
