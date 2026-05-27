@@ -106,10 +106,20 @@ function App() {
 
   const deleteNote = (noteId, e) => {
     e.stopPropagation();
+
     if (notes.length === 1) {
       alert("Нельзя удалить последнюю заметку!");
       return;
     }
+
+    // Запрашиваем подтверждение у пользователя
+    const isConfirmed = window.confirm("⚠️ Вы уверены, что хотите навсегда удалить эту заметку?");
+
+    // Если нажали "Отмена" — прерываем удаление
+    if (!isConfirmed) {
+      return;
+    }
+
     const filteredNotes = notes.filter(note => note.id !== noteId);
     if (activeNoteId === noteId) {
       const remainingNote = notes.find(note => note.id !== noteId);
@@ -117,6 +127,7 @@ function App() {
     }
     setNotes(filteredNotes);
   };
+
 
   const handleTitleChange = (newTitle) => {
     setNotes(notes.map(note =>
