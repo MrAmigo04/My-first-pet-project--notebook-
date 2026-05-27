@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/My-first-pet-project--notebook-/static/css/main.633fd06d.css",
-    "main.js": "/My-first-pet-project--notebook-/static/js/main.c85adfee.js",
+    "main.css": "/My-first-pet-project--notebook-/static/css/main.521cc61d.css",
+    "main.js": "/My-first-pet-project--notebook-/static/js/main.f6702fb8.js",
     "static/js/453.4d690037.chunk.js": "/My-first-pet-project--notebook-/static/js/453.4d690037.chunk.js",
     "index.html": "/My-first-pet-project--notebook-/index.html",
-    "main.633fd06d.css.map": "/My-first-pet-project--notebook-/static/css/main.633fd06d.css.map",
-    "main.c85adfee.js.map": "/My-first-pet-project--notebook-/static/js/main.c85adfee.js.map",
+    "main.521cc61d.css.map": "/My-first-pet-project--notebook-/static/css/main.521cc61d.css.map",
+    "main.f6702fb8.js.map": "/My-first-pet-project--notebook-/static/js/main.f6702fb8.js.map",
     "453.4d690037.chunk.js.map": "/My-first-pet-project--notebook-/static/js/453.4d690037.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.633fd06d.css",
-    "static/js/main.c85adfee.js"
+    "static/css/main.521cc61d.css",
+    "static/js/main.f6702fb8.js"
   ]
 }
