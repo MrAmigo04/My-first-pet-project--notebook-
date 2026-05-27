@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
-import './App.css';
+import './App.scss';
 
 import Navbar from './Components/Navbar';
 
@@ -11,6 +11,9 @@ import Settings from './pages/Settings';
 import About from './pages/About';
 
 import { NOTE_COLORS } from './constants/noteColors';
+
+console.log("➡️ [RENDER] Компонент App перерисовывается прямо сейчас!");
+
 
 function App() {
   const [notes, setNotes] = useState(() => {
@@ -47,6 +50,22 @@ function App() {
       setActiveNoteId(notes[0].id);
     }
   }, [notes, activeNoteId]);
+
+  // Эффект сохранения заметок
+  useEffect(() => {
+    console.log("⚡ [EFFECT] Сработал useEffect для сохранения текста! Зависимость [notes] изменилась.");
+    localStorage.setItem('notebook-text-data-v2', JSON.stringify(notes));
+  }, [notes]); // [notes] — это dependency (зависимость)
+
+// Эффект смены активной заметки
+  useEffect(() => {
+    console.log("⚡ [EFFECT] Сработал useEffect для смены ID заметки! Новая активная заметка:", activeNoteId);
+    localStorage.setItem('notebook-text-active-id-v2', JSON.stringify(activeNoteId));
+  }, [activeNoteId]); // [activeNoteId] — это dependency
+
+  useEffect(() => {
+    console.log("👶 [LIFECYCLE - MOUNT] Компонент родился! Этот код срабатывает ТОЛЬКО ОДИН РАЗ при загрузке страницы.");
+  }, []); // Пустые скобки [] означают, что эффект не следит ни за какими переменными
 
   const createNewNote = () => {
     const newNote = {
