@@ -50,42 +50,36 @@ function App() {
 
   // Эффект сохранения заметок
   useEffect(() => {
-    console.log("⚡ [EFFECT] Сработал useEffect для сохранения текста! Зависимость [notes] изменилась.");
     localStorage.setItem('notebook-text-data-v2', JSON.stringify(notes));
   }, [notes]);
 
   // Эффект смены активной заметки
   useEffect(() => {
-    console.log("⚡ [EFFECT] Сработал useEffect для смены ID заметки! Новая активная заметка:", activeNoteId);
     localStorage.setItem('notebook-text-active-id-v2', JSON.stringify(activeNoteId));
   }, [activeNoteId]);
 
-  // Запрос цитаты при монтировании (MOUNT)
+  // Функция генерации случайной локальной цитаты
+  const fetchQuote = () => {
+    const localQuotes = [
+      '"Единственный способ делать великие дела — любить то, что вы делаете." — Стив Джобс',
+      '"Вчера — история, завтра — тайна, а сегодня — подарок." — Кунг-фу Панда',
+      '"Логика может привести вас от пункта А к пункту Б, а воображение — куда угодно." — Альберт Эйнштейн',
+      '"Не тот велик, кто никогда не падал, а тот велик, кто падал и вставал." — Конфуций',
+      '"Ваше время ограничено, не тратьте его, проживая чужую жизнь." — Стив Джобс',
+      '"Успех — это способность шагать от одной неудачи к другой, не теряя энтузиазма." — Уинстон Черчилль',
+      '"Стремитесь не к успеху, а к ценности, которую вы создаете." — Альберт Эйнштейн',
+      '"Если вы хотите вести счастливую жизнь, привяжите её к цели, а не к людям или вещам." — Альберт Эйнштейн',
+      '"Лучший способ предсказать будущее — создать его." — Питер Друкер',
+      '"Тот, кто победил себя — самый сильный воин." — Лао-Цзы'
+    ];
+
+    // Выбираем случайный индекс из массива
+    const randomIndex = Math.floor(Math.random() * localQuotes.length);
+    setQuote(localQuotes[randomIndex]);
+  };
+
+  // Запрос первой цитаты при загрузке страницы
   useEffect(() => {
-    console.log("👶 [LIFECYCLE - MOUNT] Компонент родился! Запрашиваем цитату...");
-
-    const fetchQuote = async () => {
-      try {
-        const response = await fetch('https://dummyjson.com');
-        if (!response.ok) throw new Error('Ошибка сети при запросе цитаты');
-        const data = await response.json();
-
-        if (data && data.quote) {
-          setQuote(`"${data.quote}" — ${data.author}`);
-        }
-      } catch (error) {
-        console.log('Не удалось загрузить цитату из API:', error);
-
-        const localQuotes = [
-          '"Единственный способ делать великие дела — любить то, что вы делаете." — Стив Джобс',
-          '"Вчера — история, завтра — тайна, а сегодня — подарок." — Кунг-фу Панда',
-          '"Логика может привести вас от пункта А к пункту Б, а воображение — куда угодно." — Альберт Эйнштейн'
-        ];
-        const randomLocal = localQuotes[Math.floor(Math.random() * localQuotes.length)];
-        setQuote(randomLocal);
-      }
-    };
-
     fetchQuote();
   }, []);
 
@@ -140,7 +134,7 @@ function App() {
           <Navbar />
           <div className="main-content-area">
             <Routes>
-              <Route path="/" element={<Home quote={quote} />} />
+              <Route path="/" element={<Home quote={quote} onRefreshQuote={fetchQuote} />} />
               <Route
                   path="/notebook"
                   element={
