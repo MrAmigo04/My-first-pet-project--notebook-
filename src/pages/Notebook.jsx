@@ -1,19 +1,52 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from '../Components/Sidebar';
 import { countWords } from '../Utils/textUtils';
 
 import { NOTE_COLORS } from '../constants/noteColors';
 
 function Notebook({ notes, activeNoteId, setActiveNoteId, createNewNote, deleteNote, activeNote, isEditingTitle, setIsEditingTitle, handleTitleChange, handleColorChange, handleTextChange }) {
+    // 1. Создаем стейт для хранения текста поиска
+    const [searchQuery, setSearchQuery] = useState('');
+
+    // 2. Фильтруем заметки по заголовку (приводим к нижнему регистру для точности)
+    const filteredNotes = notes.filter(note =>
+        note.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <div className="notebook-page-layout">
-            <Sidebar
-                notes={notes}
-                activeNoteId={activeNoteId}
-                setActiveNoteId={setActiveNoteId}
-                createNewNote={createNewNote}
-                deleteNote={deleteNote}
-            />
+            {/* Оборачиваем сайдбар в контейнер и добавляем поле поиска сверху */}
+            <div className="sidebar-search-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <input
+                    type="text"
+                    placeholder="🔍 Поиск заметок..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{
+                        margin: '15px 15px 0 15px',
+                        padding: '10px 15px',
+                        borderRadius: '8px',
+                        border: '1px solid #ddd',
+                        backgroundColor: '#fcfaf7',
+                        fontSize: '0.9rem',
+                        outline: 'none',
+                        boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)',
+                        transition: 'border-color 0.2s'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--active-note-color, #8b5a2b)'}
+                    onBlur={(e) => e.target.style.borderColor = '#ddd'}
+                />
+
+                {/* Передаем в Sidebar уже отфильтрованный массив filteredNotes вместо исходного notes */}
+                <Sidebar
+                    notes={filteredNotes}
+                    activeNoteId={activeNoteId}
+                    setActiveNoteId={setActiveNoteId}
+                    createNewNote={createNewNote}
+                    deleteNote={deleteNote}
+                />
+            </div>
+
             <div className="notebook-cover">
                 <div className="leather-texture"></div>
                 <div className="notebook-rings">
