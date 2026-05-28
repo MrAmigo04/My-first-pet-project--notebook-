@@ -3,27 +3,23 @@ import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.scss';
 
 import Navbar from './Components/Navbar';
-
 import Home from './pages/Home';
 import Notebook from './pages/Notebook';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import About from './pages/About';
 
-import { NOTE_COLORS } from './constants/noteColors';
-
-console.log("➡️ [RENDER] Компонент App перерисовывается прямо сейчас!");
-
 function App() {
   const [quote, setQuote] = useState('Загрузка вдохновения...');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // 1. Создаем стейт тёмной темы с получением данных из localStorage
+  // Инициализация темы
   const [darkMode, setDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem('notebook-dark-mode');
     return savedTheme ? JSON.parse(savedTheme) : false;
   });
 
-  // Инициализация заметок из localStorage
+  // Инициализация заметок
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem('notebook-text-data-v2');
     return savedNotes ? JSON.parse(savedNotes) : [
@@ -36,7 +32,7 @@ function App() {
     ];
   });
 
-  // Инициализация активной заметки из localStorage
+  // Инициализация активной заметки
   const [activeNoteId, setActiveNoteId] = useState(() => {
     const savedActiveId = localStorage.getItem('notebook-text-active-id-v2');
     return savedActiveId ? JSON.parse(savedActiveId) : 1;
@@ -44,32 +40,28 @@ function App() {
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
 
-  // Вычисляем активную заметку безопасным способом
-  const activeNote = notes.find(note => note.id === activeNoteId) || notes[0];
+  // Безопасный поиск активной заметки. Если массив пуст — вернет пустой объект, а не завалит приложение
+  const activeNote = notes.find(note => note.id === activeNoteId) || notes[0] || {};
 
-  // 2. Эффект для сохранения темы в localStorage при её изменении
+  // Фильтрация заметок по поиску на верхнем уровне
+  const filteredNotes = notes.filter(note =>
+      note.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Синхронизация с localStorage
   useEffect(() => {
     localStorage.setItem('notebook-dark-mode', JSON.stringify(darkMode));
   }, [darkMode]);
 
-  // Проверка: если активная заметка была удалена, переключаемся на первую доступную
-  useEffect(() => {
-    if (notes.length > 0 && !notes.some(n => n.id === activeNoteId)) {
-      setActiveNoteId(notes[0].id);
-    }
-  }, [notes, activeNoteId]);
-
-  // Эффект сохранения заметок
   useEffect(() => {
     localStorage.setItem('notebook-text-data-v2', JSON.stringify(notes));
   }, [notes]);
 
-  // Эффект смены активной заметки
   useEffect(() => {
     localStorage.setItem('notebook-text-active-id-v2', JSON.stringify(activeNoteId));
   }, [activeNoteId]);
 
-  // Функция генерации случайной локальной цитаты
+  // Загрузка цитат
   const fetchQuote = () => {
     const localQuotes = [
       '"Единственный способ делать великие дела — любить то, что вы делаете." — Стив Джобс',
@@ -83,12 +75,10 @@ function App() {
       '"Лучший способ предсказать будущее — создать его." — Питер Друкер',
       '"Тот, кто победил себя — самый сильный воин." — Лао-Цзы'
     ];
-
     const randomIndex = Math.floor(Math.random() * localQuotes.length);
     setQuote(localQuotes[randomIndex]);
   };
 
-  // Запрос первой цитаты при загрузке страницы
   useEffect(() => {
     fetchQuote();
   }, []);
@@ -112,52 +102,40 @@ function App() {
       return;
     }
 
-    // Запрашиваем подтверждение у пользователя
-    const isConfirmed = window.confirm("⚠️ Вы уверены, что хотите навсегда удалить эту заметку?");
-
-    // Если нажали "Отмена" — прерываем удаление
-    if (!isConfirmed) {
+    if (!window.confirm("⚠️ Вы уверены, что хотите навсегда удалить эту заметку?")) {
       return;
     }
 
-    const filteredNotes = notes.filter(note => note.id !== noteId);
+    const filteredNotesList = notes.filter(note => note.id !== noteId);
+
     if (activeNoteId === noteId) {
       const remainingNote = notes.find(note => note.id !== noteId);
       setActiveNoteId(remainingNote.id);
     }
-    setNotes(filteredNotes);
+
+    setNotes(filteredNotesList);
   };
 
-
-  const handleTitleChange = (newTitle) => {
-    setNotes(notes.map(note =>
-        note.id === activeNote.id ? { ...note, title: newTitle } : note
-    ));
+  // Универсальный DRY-метод обновления полей
+  const updateActiveNote = (fieldsToUpdate) => {
+    if (!activeNote.id) return; // Защита, если заметок нет
+    setNotes(prevNotes =>
+        prevNotes.map(note =>
+            note.id === activeNote.id ? { ...note, ...fieldsToUpdate } : note
+        )
+    );
   };
 
-  const handleColorChange = (color) => {
-    setNotes(notes.map(note =>
-        note.id === activeNote.id ? { ...note, color: color } : note
-    ));
-  };
-
-  const handleTextChange = (newText) => {
-    setNotes(notes.map(note =>
-        note.id === activeNote.id ? { ...note, text: newText } : note
-    ));
-  };
-
-  // 3. Функция переключения ночного режима
   const handleToggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
 
-  if (!activeNote) return null;
-
   return (
       <Router>
-        {/* Добавляем динамический класс dark-theme в зависимости от состояния стейта */}
-        <div className={`app-main-wrapper ${darkMode ? 'dark-theme' : ''}`} style={{ '--active-note-color': activeNote.color }}>
+        <div
+            className={`app-main-wrapper ${darkMode ? 'dark-theme' : ''}`}
+            style={{ '--active-note-color': activeNote.color || '#8b5a2b' }}
+        >
           <Navbar />
           <div className="main-content-area">
             <Routes>
@@ -166,7 +144,7 @@ function App() {
                   path="/notebook"
                   element={
                     <Notebook
-                        notes={notes}
+                        notes={filteredNotes}
                         activeNoteId={activeNoteId}
                         setActiveNoteId={setActiveNoteId}
                         createNewNote={createNewNote}
@@ -174,15 +152,13 @@ function App() {
                         activeNote={activeNote}
                         isEditingTitle={isEditingTitle}
                         setIsEditingTitle={setIsEditingTitle}
-                        handleTitleChange={handleTitleChange}
-                        NOTE_COLORS={NOTE_COLORS}
-                        handleColorChange={handleColorChange}
-                        handleTextChange={handleTextChange}
+                        updateActiveNote={updateActiveNote}
+                        searchQuery={searchQuery}
+                        setSearchQuery={setSearchQuery}
                     />
                   }
               />
-              <Route path="/analytics" element={<Analytics notes={notes} />} />
-              {/* Передаем пропсы darkMode и функцию handleToggleDarkMode в компонент Settings */}
+              <Route path="/analytics" element={<Analytics notes={notes} darkMode={darkMode} />} />
               <Route path="/settings" element={<Settings darkMode={darkMode} onToggleDarkMode={handleToggleDarkMode} />} />
               <Route path="/about" element={<About />} />
             </Routes>

@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Sidebar from '../Components/Sidebar';
 import { countWords } from '../Utils/textUtils';
-import { NOTE_COLORS } from '../constants/noteColors';
 
 function Notebook({
                       notes,
@@ -12,22 +11,16 @@ function Notebook({
                       activeNote,
                       isEditingTitle,
                       setIsEditingTitle,
-                      handleTitleChange,
-                      handleColorChange,
-                      handleTextChange
+                      updateActiveNote,
+                      NOTE_COLORS,
+                      searchQuery,
+                      setSearchQuery
                   }) {
-
-    const [searchQuery, setSearchQuery] = useState('');
-
-    const filteredNotes = notes.filter(note =>
-        note.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
 
     return (
         <div className="notebook-page-layout">
-
             <Sidebar
-                notes={filteredNotes}
+                notes={notes}
                 activeNoteId={activeNoteId}
                 setActiveNoteId={setActiveNoteId}
                 createNewNote={createNewNote}
@@ -37,7 +30,6 @@ function Notebook({
             />
 
             <div className="notebook-cover">
-
                 <div className="leather-texture"></div>
 
                 <div className="notebook-rings">
@@ -47,18 +39,15 @@ function Notebook({
                 </div>
 
                 <div className="notebook">
-
                     <div className="paper-texture"></div>
 
                     <div className="title-container">
-
                         {isEditingTitle ? (
                             <div className="title-edit-zone">
-
                                 <input
                                     type="text"
                                     value={activeNote.title}
-                                    onChange={(e) => handleTitleChange(e.target.value)}
+                                    onChange={(e) => updateActiveNote({ title: e.target.value })}
                                     onBlur={() => setTimeout(() => setIsEditingTitle(false), 200)}
                                     className="title-input"
                                     autoFocus
@@ -70,37 +59,29 @@ function Notebook({
                                             key={color}
                                             className={`color-dot ${activeNote.color === color ? 'selected' : ''}`}
                                             style={{ backgroundColor: color }}
-                                            onClick={() => handleColorChange(color)}
+                                            onClick={() => updateActiveNote({ color: color })}
                                         />
                                     ))}
                                 </div>
-
                             </div>
                         ) : (
-                            <h1
-                                className="title"
-                                onClick={() => setIsEditingTitle(true)}
-                            >
+                            <h1 className="title" onClick={() => setIsEditingTitle(true)}>
                                 {activeNote.title} ✏️
                             </h1>
                         )}
-
                     </div>
 
                     <div className="char-counter">
-                        Символов: {activeNote.text.length} |
-                        Слов: {countWords(activeNote.text)}
+                        Символов: {activeNote.text.length} | Слов: {countWords(activeNote.text)}
                     </div>
 
                     <textarea
                         className="notebook-editor"
                         placeholder="Начни писать свои мысли здесь..."
                         value={activeNote.text}
-                        onChange={(e) => handleTextChange(e.target.value)}
+                        onChange={(e) => updateActiveNote({ text: e.target.value })}
                     />
-
                 </div>
-
             </div>
 
             <div className="desk-pencil">
@@ -110,7 +91,6 @@ function Notebook({
                 <div className="pencil-eraser-gold"></div>
                 <div className="pencil-eraser"></div>
             </div>
-
         </div>
     );
 }
